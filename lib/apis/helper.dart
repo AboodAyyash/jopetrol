@@ -44,23 +44,14 @@ Future callApi(
                 Uri.parse(withBaseURL == WithBaseURL.yes
                     ? '${settings.baseURL}$url'
                     : '$url'),
-                body: bodyApi, //{'key':'value'}
+                body: jsonEncode(bodyApi), //{'key':'value'}
                 headers: settings.headers,
               );
+              print(response.body);
         responseJson = json.decode(response.body);
 
-        if (response.statusCode == 200 || response.statusCode == 201) {
-        } else if (response.statusCode == 401) {
-          //  serviceAuth.signOut();
-          print("responseJson" + responseJson.toString());
-          print("response.statusCode ${response.statusCode}");
-        } else {
-          print("responseJson" + responseJson.toString());
-          print("response.statusCode ${response.statusCode}");
-        }
+       
       } catch (e) {
-        print("${response.statusCode}");
-        print('${settings.baseURL}$url');
         print("Url is :" + url.toString());
         print("exception handld is :" + e.toString());
       }

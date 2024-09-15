@@ -27,7 +27,7 @@ Future getUserId() async {
 void setHeader() {
 
   settings.headers = {
-    'Accept': 'application/json',
+    'Content-Type': 'application/json',
    
   };
 }
