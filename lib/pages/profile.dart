@@ -17,8 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: Column(
         children: [
+          Text("ID ${userModelData!.id}"),
           Text("Name ${userModelData!.name}"),
-          Text("Password ${userModelData!.name}"),
         ],
       ),
     );

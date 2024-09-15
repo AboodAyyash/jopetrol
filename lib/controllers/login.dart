@@ -1,6 +1,7 @@
 import 'package:flutter_jo/apis/helper.dart';
 
 class LoginController {
+  LoginController();
   Future loginApi() async {
     var body = {
       'token': "Cf6NNPsEWmRd43L8+GnJt3a90OojMj9mBzUqRANTduE=",
@@ -10,10 +11,13 @@ class LoginController {
         "deviceName": "LD90013234",
       }
     };
-    callApi(method: ApiMethod.post, url: "CheckUserLogin", body: body)
+    var allData ;
+    await callApi(method: ApiMethod.post, url: "CheckUserLogin", body: body)
         .then((onValue) {
-      print(onValue);
+      print("onValuess $onValue");
+      allData = onValue;
       return onValue;
     });
+    return allData;
   }
 }

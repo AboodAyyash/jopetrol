@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jo/controllers/login.dart';
+import 'package:flutter_jo/pages/profile.dart';
 import 'package:flutter_jo/services/service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                 ),
-                TextButton(
+                TextButton( 
                   onPressed: () {
                     nameCon.text = "Ahmad";
                     passwordCon.text = "123456";
@@ -135,10 +136,24 @@ class _LoginPageState extends State<LoginPage> {
                     if (formKey.currentState!.validate()) {
                       LoginController loginController = LoginController();
                       loginController.loginApi().then((onValue) {
-                        print(onValue);
+                     
+                        if (onValue['data']['EmpName'] == null) {
+                          print("Error");
+                        } else {
+                          saveUser(nameCon.text, passwordCon.text,
+                              "Cf6NNPsEWmRd43L8+GnJt3a90OojMj9mBzUqRANTduE=");
+                         /*  Navigator.push<void>(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) => ProfilePage(),
+                            ),
+                          ); */
+                        }
+                        // if(onValue[])
                       });
-                      //saveUserId(passwordCon.text);
 
+/*  saveUser(nameCon.text, passwordCon.text,
+                          "Cf6NNPsEWmRd43L8+GnJt3a90OojMj9mBzUqRANTduE="); */
                       /*  var url = Uri.https('example.com', 'whatsit/create');
                       var response = await http
                           .post(url, body: {'name': 'doodle', 'color': 'blue'});

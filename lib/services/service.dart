@@ -1,34 +1,32 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_jo/shared/shared.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_jo/shared/settings.dart' as settings;
-Future saveUserId(id) async {
+
+Future saveUser(id, password, token) async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.setString('userId', id);
-  userId = id;
-  print(userId);
+  await sharedPreferences.setString('userPassword', password);
+  await sharedPreferences.setString('token', token);
+
   return true;
 }
 
-Future getUserId() async {
+Future getUser() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   print(sharedPreferences.getString('userId'));
-  if (sharedPreferences.getString('userId') == null) {
-    userId = '';
-  } else {
-    userId = sharedPreferences.getString('userId')!;
-  }
-  return userId;
+  var userData = {};
+  userData = {
+    'id': sharedPreferences.getString('userId'),
+    'password': sharedPreferences.getString('userPassword'),
+    'token': sharedPreferences.getString('token'),
+  };
+  return userData;
 }
 
-
-
 void setHeader() {
-
   settings.headers = {
     'Content-Type': 'application/json',
-   
   };
 }
 

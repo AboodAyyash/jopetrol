@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_jo/controllers/login.dart';
 import 'package:flutter_jo/models/user.dart';
 import 'package:flutter_jo/pages/login.dart';
 import 'package:flutter_jo/pages/profile.dart';
 import 'package:flutter_jo/services/service.dart';
 import 'package:flutter_jo/shared/shared.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -25,9 +25,9 @@ class _SplashPageState extends State<SplashPage> {
 
   checkData() {
     Timer(Duration(seconds: 3), () async {
-      getUserId().then((onValue) {
+      getUser().then((onValue) {
         print(onValue);
-        if (onValue == '') {
+        if (onValue == {}) {
           print("Need Login");
           Navigator.pushReplacement<void, void>(
             context,
@@ -40,14 +40,25 @@ class _SplashPageState extends State<SplashPage> {
 
           //get user data by api
 
-          userModelData  = UserModel(password: '', name: '');
+          //userModelData  = UserModel(id: '', name: '');
 
-          Navigator.pushReplacement<void, void>(
-            context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => const LoginPage(),
-            ),
-          );
+          LoginController loginController = LoginController();
+          loginController.loginApi().then((apiValue) {
+            if (apiValue['data']['EmpName'] == null) {
+              print("Error");
+            } else {
+              userModelData = UserModel(
+                  id: apiValue['data']['CurrentEmpID'],
+                  name: apiValue['data']['EmpName']);
+              saveUser(onValue['id'], onValue['password'], onValue['token']);
+              Navigator.pushReplacement<void, void>(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) => ProfilePage(),
+                ),
+              );
+            }
+          });
         }
       });
     });
