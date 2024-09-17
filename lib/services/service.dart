@@ -1,10 +1,15 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jo/shared/shared.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_jo/shared/settings.dart' as settings;
 
 Future saveUser(id, password, token) async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
   await sharedPreferences.setString('userId', id);
   await sharedPreferences.setString('userPassword', password);
   await sharedPreferences.setString('token', token);
@@ -16,17 +21,36 @@ Future getUser() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   print(sharedPreferences.getString('userId'));
   var userData = {};
-  userData = {
-    'id': sharedPreferences.getString('userId'),
-    'password': sharedPreferences.getString('userPassword'),
-    'token': sharedPreferences.getString('token'),
-  };
+  String id = sharedPreferences.getString('userId') ?? "";
+  String password = sharedPreferences.getString('userPassword') ?? "";
+  String token = sharedPreferences.getString('token') ?? "";
+  if (id != '' && password != '' && token != '') {
+    userData = {
+      'id': sharedPreferences.getString('userId'),
+      'password': sharedPreferences.getString('userPassword'),
+      'token': sharedPreferences.getString('token'),
+    };
+  }
+
   return userData;
 }
 
-void setHeader() {
+void setHeader(body) {
+  String xDate = dateToUtc();
+  String xToken = convertToHMac(// 0-10 +.+ 0-10
+      "${convertToHMac( //hmac result ==> xDate 0-10
+              convertToBase64( //base 64 result
+                  convertToMd5(xDate))) //md5 result
+          .toString().substring(0, 10)}.${convertToHMac( //hmac ==> body 0-10
+          convertToBase64( //base 64
+              convertToMd5( // md5
+                  body.toString()))).toString().substring(0, 10)}");
+
   settings.headers = {
     'Content-Type': 'application/json',
+    'X-Token': xToken,
+    'X-Body': body.toString(),
+    'X-Timestamp': xDate,
   };
 }
 
@@ -43,4 +67,54 @@ String replaceNumbers(value) {
   value = value.replaceAll(RegExp(r'٩'), '9');
 
   return value;
+}
+
+String dateToUtc() {
+  final dateUtc = DateTime.now().toUtc();
+
+  String formattedTimestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateUtc);
+
+  return formattedTimestamp;
+}
+
+String convertToMd5(value) {
+  String originalString = value;
+
+  // Convert the string to bytes
+  List<int> bytes = utf8.encode(originalString);
+
+  // Generate the MD5 hash
+  Digest digest = md5.convert(bytes);
+
+  // Convert the hash to a hexadecimal string
+  String md5Hash = digest.toString();
+  return md5Hash;
+}
+
+String convertToBase64(String value) {
+  // Convert the string to bytes
+  List<int> bytes = utf8.encode(value);
+
+  // Encode the bytes to Base64
+  String base64String = base64Encode(bytes);
+
+  return base64String;
+}
+
+String convertToHMac(value) {
+  String originalString = value;
+  String secretKey = value; // Replace with your actual secret key
+
+  // Convert the string and key to bytes
+  List<int> bytes = utf8.encode(originalString);
+  List<int> key = utf8.encode(secretKey);
+
+  // Generate the HMAC using SHA256
+  Hmac hmacSha256 = Hmac(sha256, key); // You can use other hash algorithms too
+  Digest digest = hmacSha256.convert(bytes);
+
+  // Convert the HMAC to a hexadecimal string
+  String hmac = digest.toString();
+
+  return hmac;
 }

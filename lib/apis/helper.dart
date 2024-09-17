@@ -28,7 +28,7 @@ Future callApi(
   var responseJson;
   var response;
   var bodyApi = body;
-  service.setHeader();
+  service.setHeader(bodyApi.toString());
   await checkInternet(showConnectionPage).then((value) async {
     if (value) {
       try {
@@ -47,10 +47,8 @@ Future callApi(
                 body: jsonEncode(bodyApi), //{'key':'value'}
                 headers: settings.headers,
               );
-              print(response.body);
+        print(response.body);
         responseJson = json.decode(response.body);
-
-       
       } catch (e) {
         print("Url is :" + url.toString());
         print("exception handld is :" + e.toString());
