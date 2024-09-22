@@ -20,7 +20,7 @@ enum ShowConnectionPage {
 }
 
 Future callApi(
-    {url,
+    {endPoint,
     body,
     required method,
     withBaseURL = WithBaseURL.yes,
@@ -32,25 +32,35 @@ Future callApi(
   await checkInternet(showConnectionPage).then((value) async {
     if (value) {
       try {
-        print('${settings.baseURL}$url');
         response = method == ApiMethod.get
             ? await http.get(
                 Uri.parse(withBaseURL == WithBaseURL.yes
-                    ? '${settings.baseURL}$url'
-                    : '$url'),
+                    ? '${settings.baseURL}$endPoint' //jopotrol.com/apis/login ==> baseurl (jopotrol.com/apis/), ==> endpoint (login)
+                    : '$endPoint'), //efwateerkom.com/login
                 headers: settings.headers,
               )
             : await http.post(
                 Uri.parse(withBaseURL == WithBaseURL.yes
-                    ? '${settings.baseURL}$url'
-                    : '$url'),
+                    ? '${settings.baseURL}$endPoint'
+                    : '$endPoint'),
                 body: jsonEncode(bodyApi), //{'key':'value'}
                 headers: settings.headers,
               );
         print(response.body);
         responseJson = json.decode(response.body);
+
+        /*    Map resp = {
+          "data": {},
+          "status": 200,
+          "msg": "Done!",
+        };
+        if (resp['data'] != {}) {
+          return resp['data'];
+        } else {
+          return resp['msg'];
+        } */
       } catch (e) {
-        print("Url is :" + url.toString());
+        print("Url is :" + endPoint.toString());
         print("exception handld is :" + e.toString());
       }
     } else {}

@@ -43,7 +43,10 @@ class _SplashPageState extends State<SplashPage> {
           //userModelData  = UserModel(id: '', name: '');
 
           LoginController loginController = LoginController();
-          loginController.loginApi().then((apiValue) {
+          loginController.getAllData().then((onValue) {
+            print(onValue);
+          });
+          /*     loginController.loginApi().then((apiValue) {
             if (apiValue['data']['EmpName'] == null) {
               print("Error");
             } else {
@@ -59,6 +62,7 @@ class _SplashPageState extends State<SplashPage> {
               );
             }
           });
+       */
         }
       });
     });

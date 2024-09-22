@@ -74,7 +74,7 @@ String dateToUtc() {
 
   String formattedTimestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateUtc);
 
-  return formattedTimestamp;
+  return replaceNumbers(formattedTimestamp);
 }
 
 String convertToMd5(value) {
