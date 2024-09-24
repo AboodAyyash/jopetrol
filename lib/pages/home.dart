@@ -16,45 +16,10 @@ class _HomePageState extends State<HomePage> {
     {"name": "Latte", 'id': '3'},
   ];
 
-  List<Product> products = [
-    Product(
-        name: "Mocca 1",
-        categoryId: '1',
-        desc: 'desc 1',
-        id: '1',
-        image: 'assets/images/logo.png',
-        price: '10'),
-    Product(
-        name: "Mocca 2",
-        categoryId: '1',
-        desc: 'desc 2',
-        id: '2',
-        image: 'assets/images/logo.png',
-        price: '10'),
-    Product(
-        name: "Mocca 3",
-        categoryId: '2',
-        desc: 'desc 3',
-        id: '3',
-        image: 'assets/images/logo.png',
-        price: '10'),
-    Product(
-        name: "Mocca 4",
-        categoryId: '2',
-        desc: 'desc 4',
-        id: '4',
-        image: 'assets/images/logo.png',
-        price: '10'),
-    Product(
-        name: "Mocca 5",
-        categoryId: '3',
-        desc: 'desc 5',
-        id: '5',
-        image: 'assets/images/logo.png',
-        price: '10'),
-  ];
+  List<Product> products = [];
 
   String selectedCategoryId = '0';
+
   @override
   void initState() {
     // TODO: implement initState
@@ -70,17 +35,71 @@ class _HomePageState extends State<HomePage> {
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('products').get();
 
-      List<Map<String, dynamic>> productsWithId = [];
-
       for (var doc in snapshot.docs) {
-        productsWithId.add({
-          'data': doc.data(),
-          'id': doc.id,
-        });
+        Map data = doc.data() as Map;
+
+        products.add(Product(
+          name: data['name'],
+          categoryId: data['categoryId'].toString(),
+          desc: data['desc'],
+          id: data['id'].toString(),
+          image: data['image'] ?? "assets/images/logo.png",
+          documnetId: doc.id.toString(),
+          price: data['price'].toString(),
+        ));
       }
-      print(productsWithId);
+      setState(() {});
     } on FirebaseException catch (e) {
       print('Error fetching data: ${e.message}');
+    } catch (e) {
+      print('Unknown error: $e');
+    }
+  }
+
+  void updateProductName(String documentId, String newName) async {
+    try {
+      DocumentReference productRef =
+          FirebaseFirestore.instance.collection('products').doc(documentId);
+
+      await productRef.update({
+        'name': newName,
+      });
+
+      print('Product name updated successfully');
+    } on FirebaseException catch (e) {
+      print('Error updating product: ${e.message}');
+    } catch (e) {
+      print('Unknown error: $e');
+    }
+  }
+
+  void addProductDataWithoutID(Map<String, dynamic> productData) async {
+    try {
+      // Add a new document with a randomly generated ID to the 'products' collection
+      DocumentReference newDocRef =
+          await FirebaseFirestore.instance.collection('cart').add(productData);
+
+      // Print the newly created document ID
+      print('Product added with ID: ${newDocRef.id}');
+    } on FirebaseException catch (e) {
+      print('Error adding product: ${e.message}');
+    } catch (e) {
+      print('Unknown error: $e');
+    }
+  }
+
+  void setProductInCartDataWithMerge(
+      {required String documentId,
+      required Map<String, dynamic> productData}) async {
+    try {
+      DocumentReference productRef =
+          FirebaseFirestore.instance.collection('cart').doc(documentId);
+
+      await productRef.set(productData, SetOptions(merge: true));
+
+      print('Product data merged successfully');
+    } on FirebaseException catch (e) {
+      print('Error merging product data: ${e.message}');
     } catch (e) {
       print('Unknown error: $e');
     }
@@ -207,7 +226,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget productWidget(Product productData) {
-    return Container(
+    return InkWell(
+      onTap: () {
+        /*   setProductInCartDataWithMerge(
+            documentId: 'qklhro325yo',
+            productData: {'name': productData.name, 'id': productData.id}); */
+
+        //  addProductDataWithoutID({'name': productData.name, 'id': productData.id});
+      },
       child: Column(
         children: [
           Image.asset(
@@ -236,6 +262,7 @@ class Product {
   String categoryId;
   String price;
   String desc;
+  String documnetId;
 
   Product(
       {required this.name,
@@ -243,5 +270,6 @@ class Product {
       required this.desc,
       required this.id,
       required this.image,
+      required this.documnetId,
       required this.price});
 }
