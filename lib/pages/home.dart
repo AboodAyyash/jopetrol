@@ -56,14 +56,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void updateProductName(String documentId, String newName) async {
+  void updateProductData(
+      {required String documentId,
+      required Map<Object, Object> product}) async {
     try {
       DocumentReference productRef =
           FirebaseFirestore.instance.collection('products').doc(documentId);
 
-      await productRef.update({
-        'name': newName,
-      });
+      await productRef.update(product);
 
       print('Product name updated successfully');
     } on FirebaseException catch (e) {
@@ -83,6 +83,23 @@ class _HomePageState extends State<HomePage> {
       print('Product added with ID: ${newDocRef.id}');
     } on FirebaseException catch (e) {
       print('Error adding product: ${e.message}');
+    } catch (e) {
+      print('Unknown error: $e');
+    }
+  }
+
+  void searchProductByName(String name) async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: name)
+          .get();
+      print(snapshot.docs);
+      for (var doc in snapshot.docs) {
+        print(doc.data()); // Prints the product data that matches the search
+      }
+    } on FirebaseException catch (e) {
+      print('Error fetching data: ${e.message}');
     } catch (e) {
       print('Unknown error: $e');
     }
@@ -233,6 +250,12 @@ class _HomePageState extends State<HomePage> {
             productData: {'name': productData.name, 'id': productData.id}); */
 
         //  addProductDataWithoutID({'name': productData.name, 'id': productData.id});
+
+        /* updateProductData(documentId: productData.documnetId, product: {
+          'newName': "New Name",
+          'name': "Updated Name",
+        }); */
+        searchProductByName("Product 2");
       },
       child: Column(
         children: [
