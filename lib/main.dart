@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jo/firebase_options.dart';
 import 'package:flutter_jo/pages/home.dart';
 import 'package:flutter_jo/pages/profile.dart';
 import 'package:flutter_jo/pages/splash.dart';
@@ -16,10 +18,14 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+void main() async {
   HttpOverrides.global = new MyHttpOverrides();
   runApp(const MyApp());
-}
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  Firebase.initializeApp();
+} 
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

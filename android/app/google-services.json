@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "505492971401",
+    "project_id": "jopetrol-f161d",
+    "storage_bucket": "jopetrol-f161d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505492971401:android:27a9612cbd53101a208b58",
+        "android_client_info": {
+          "package_name": "com.example.flutter_jo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8bbpkSqMnyNu-fyXYvqtvxIsMXguhLA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

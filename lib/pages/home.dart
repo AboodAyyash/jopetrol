@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jo/firebase/firebas.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -60,6 +62,28 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       categories.insert(0, {"name": "All", 'id': '0'});
     });
+    fetchProducts();
+  }
+
+  void fetchProducts() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('products').get();
+
+      List<Map<String, dynamic>> productsWithId = [];
+
+      for (var doc in snapshot.docs) {
+        productsWithId.add({
+          'data': doc.data(),
+          'id': doc.id,
+        });
+      }
+      print(productsWithId);
+    } on FirebaseException catch (e) {
+      print('Error fetching data: ${e.message}');
+    } catch (e) {
+      print('Unknown error: $e');
+    }
   }
 
   @override
@@ -149,7 +173,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-     
           GridView.count(
             crossAxisCount: 3,
             shrinkWrap: true,
