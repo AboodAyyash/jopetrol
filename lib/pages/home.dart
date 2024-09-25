@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jo/firebase/firebas.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -122,11 +128,121 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  XFile? image;
+  Uint8List? imageData;
+  ImagePicker picker = ImagePicker();
+  File? selectedFile;
+  String fileName = '';
+  String fullFileName = '';
+  String firestoreLink =
+      "https://firebasestorage.googleapis.com/v0/b/jopetrol-f161d.appspot.com/o/";
+
+  String randomId() {
+    Random random = Random();
+    return random.nextInt(99999999).toString();
+  }
+
+  Future uploadImage() async {
+    if (imageData != null) {
+      fileName = randomId();
+      fullFileName = "${firestoreLink}images%2F$fileName?alt=media";
+      print(fullFileName);
+      try {
+        final metadata = SettableMetadata(
+          contentType: 'image/jpeg',
+        );
+        await FirebaseStorage.instance
+            .ref('images/$fileName')
+            .putData(imageData!, metadata);
+      } on FirebaseException catch (e) {
+        print('error is ${e.message}');
+      }
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<String?> selectPicture(ImageSource source) async {
+    image = await picker.pickImage(
+      source: source,
+      maxHeight: 1000,
+      maxWidth: 1000,
+    );
+    selectedFile = File(image!.path);
+
+    return image!.path;
+  }
+
+  void pickImage() async {
+    setState(() {
+      selectPicture(ImageSource.gallery).then((value) async {
+        imageData = await XFile(value!).readAsBytes();
+        setState(() {
+          
+        });
+      });
+    
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
+          InkWell(
+            onTap: () {
+              pickImage();
+            },
+            child: imageData != null
+                ? Image.memory(
+                    imageData!,
+                    width: 230,
+                    height: 160,
+                  )
+                : Container(
+                    margin: EdgeInsets.only(left: 25),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                          color: Colors.grey.withOpacity(0.5), width: 1),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    width: 230,
+                    height: 160,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_search_rounded,
+                          color: Colors.grey.shade400,
+                          size: 50,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            "Select Image",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+          TextButton(
+              onPressed: () {
+                uploadImage();
+              },
+              child: Text("Upload")),
           Container(
             height: 400,
             child: Stack(
