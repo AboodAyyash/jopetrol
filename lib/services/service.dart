@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jo/shared/shared.dart';
 import 'package:intl/intl.dart';
@@ -118,3 +119,59 @@ String convertToHMac(value) {
 
   return hmac;
 }
+
+
+
+
+void requestPermission() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    print('User declined or has not accepted permission');
+  }
+}
+
+
+void setupFirebaseMessagingListeners() {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Notification title: ${message.notification!.title}');
+      print('Notification body: ${message.notification!.body}');
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    print('A new onMessageOpenedApp event was published!');
+    print(message.data);
+    /* 
+    message.data = {'title':"",body:"",payload:"",image:""}
+     */
+    if(message.data['payload'] == "leave"){
+      //navigate to leave page
+    }
+  });
+}
+
+
+void getToken() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  String? token = await messaging.getToken();
+  print("FCM Token: $token");
+}
+

@@ -47,11 +47,19 @@ android {
         versionName = flutterVersionName
     }
 
+     signingConfigs {
+        release {
+            storeFile file("/Users/echotech/Desktop/jopetrol/jopetrol.jks") // Path to your JKS file
+            storePassword "123456"
+            keyAlias "jopetrol"
+            keyPassword "123456"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            // ...
+            signingConfig signingConfigs.release
         }
     }
 }

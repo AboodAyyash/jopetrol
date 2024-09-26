@@ -18,6 +18,9 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
+    setupFirebaseMessagingListeners();
+    requestPermission();
+    getToken();
     // TODO: implement initState
     super.initState();
     checkData();
